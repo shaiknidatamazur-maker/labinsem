@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f5fa;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #ccc;
+        }
+
+        h2 {
+            text-align: center;
+            color: #234e9b;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .add-btn {
+            background: #2563eb;
+            width: 100%;
+        }
+
+        .delete-btn {
+            background: #dc2626;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background: #2563eb;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background: #f2f5fa;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Student Management System</h2>
+
+    <form id="studentForm">
+        <input type="text" id="studentId"
+               placeholder="Student ID" required>
+
+        <input type="text" id="studentName"
+               placeholder="Student Name" required>
+
+        <input type="text" id="course"
+               placeholder="Course" required>
+
+        <input type="number" id="marks"
+               placeholder="Marks (0-100)"
+               min="0" max="100" required>
+
+        <button type="submit" class="add-btn">
+            Add Student
+        </button>
+    </form>
+
+    <h3>Student Records</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Course</th>
+                <th>Marks</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="studentTable"></tbody>
+    </table>
+</div>
+
+<script>
+    let students = JSON.parse(
+        localStorage.getItem("students")
+    ) || [];
+
+    const form = document.getElementById("studentForm");
+    const table = document.getElementById("studentTable");
+
+    function displayStudents() {
+        table.innerHTML = "";
+
+        students.forEach(function(student, index) {
+            const row = table.insertRow();
+
+            [student.id, student.name, student.course, student.marks]
+                .forEach(function(value) {
+                    const cell = row.insertCell();
+                    cell.textContent = value;
+                });
+
+            const actionCell = row.insertCell();
+            const button = document.createElement("button");
+
+            button.textContent = "Delete";
+            button.className = "delete-btn";
+            button.onclick = function() {
+                deleteStudent(index);
+            };
+
+            actionCell.appendChild(button);
+        });
+    }
+
+    form.addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const id = document.getElementById("studentId").value.trim();
+        const name = document.getElementById("studentName").value.trim();
+        const course = document.getElementById("course").value.trim();
+        const marks = Number(document.getElementById("marks").value);
+
+        if (students.some(student => student.id === id)) {
+            alert("Student ID already exists!");
+            return;
+        }
+
+        students.push({
+            id: id,
+            name: name,
+            course: course,
+            marks: marks
+        });
+
+        localStorage.setItem("students", JSON.stringify(students));
+
+        form.reset();
+        displayStudents();
+    });
+
+    function deleteStudent(index) {
+        students.splice(index, 1);
+
+        localStorage.setItem("students", JSON.stringify(students));
+
+        displayStudents();
+    }
+
+    displayStudents();
+</script>
+
+</body>
+</html>
